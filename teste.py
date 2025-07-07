@@ -7,13 +7,14 @@ def clean_and_read_text(input_file):
         start = False #SÓ VIRA True quando encontrar o primeiro Capitulo
         for line in reader:
             line = line.strip()
-            if not start and 'CAPÍTULO PRIMEIRO' in line:
+            if line.startswith('CAPÍTULO'):
                 start = True
                 continue
+            if line=='Fim':
+                start = False #vira false se encontrar fim
+                continue
             if start:
-                if line.startswith('CAPÍTULO') or line.startswith('Fim'):   #tira as linhas que começam com capitulo
-                    continue
-                text += ' ' + line.lower()
+                text += ' '+line.lower()
 
     pontuacoes = ['.', ',', '!', '?', ';', ':', '(', ')', '“', '”', '"',]
     texto_tratado = ''
