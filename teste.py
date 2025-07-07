@@ -11,9 +11,9 @@ def clean_and_read_text(input_file):
                 start = True
                 continue
             if start:
-                if line.startswith('CAPÍTULO'): #tira as linhas que começam com capitulo
+                if line.startswith('CAPÍTULO') or line.startswith('Fim'):   #tira as linhas que começam com capitulo
                     continue
-                text += line.lower()
+                text += ' ' + line.lower()
 
     pontuacoes = ['.', ',', '!', '?', ';', ':', '(', ')', '“', '”', '"',]
     texto_tratado = ''
@@ -106,7 +106,7 @@ arquivo = "memoriasBras-_1_.txt"
 texto = clean_and_read_text(arquivo)
 modelo = build_hexagram_model(texto)
 
-tokens_gerados = generate_text(modelo, length=40)
-
+tokens_gerados = generate_text(modelo, length=100)
+print(len(texto))
 print("\nTexto gerado:\n")
 print(formatar_texto(tokens_gerados))
