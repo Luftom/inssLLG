@@ -7,7 +7,7 @@ def clean_and_read_text(input_file):
         text = ''
         start = False #SÓ VIRA True quando encontrar o primeiro Capitulo
         for line in reader:
-            line = line.strip()
+            line = line.strip() #limpa a string
             if line.startswith('CAPÍTULO'):
                 start = True
                 continue
@@ -23,15 +23,15 @@ def clean_and_read_text(input_file):
         else:
             texto_tratado += caractere
 
-    palavras = texto_tratado.split() #cria ums lista separando cada palavra e tirando coisas como o \n
+    palavras = texto_tratado.split() #cria ums lista separando cada palavra
     return palavras
 
-def build_quadrigram_model(palavras): #é oq cria o modelo do nosso quadrigrama, meio parecido com o window
+def build_pentagram_model(palavras): #é oq cria o modelo do nosso pentagrama, meio parecido com o window
     modelo = {}
 
-    for i in range(len(palavras) - 4):
-        chave = tuple(palavras[i:i+4]) #cria uma tupla com 4 palavras
-        proxima = palavras[i+4]
+    for i in range(len(palavras) - 5):
+        chave = tuple(palavras[i:i+5]) #cria uma tupla com 4 palavras
+        proxima = palavras[i+5]
 
         if chave not in modelo: 
             modelo[chave] = {}
@@ -40,7 +40,7 @@ def build_quadrigram_model(palavras): #é oq cria o modelo do nosso quadrigrama,
     return modelo
 
 def generate_text(modelo, start_words=None, length=40):
-    #Gera texto com base em modelo de quadrigramas, evitando começar com pontuação.
+    #Gera texto com base em modelo de pnetagramas, evitando começar com pontuação.
     if not modelo:
         return "Erro: modelo vazio."
     if not start_words:
@@ -54,9 +54,9 @@ def generate_text(modelo, start_words=None, length=40):
     else:
         start_words = tuple(start_words)
         chaves_possiveis = [] 
-        if len(start_words) != 4 or start_words not in modelo: #se n for um quadrigrama ou se o gradrigrama n estiver no modelo
+        if len(start_words) != 5 or start_words not in modelo: #se n for um pentagrama ou se o gradrigrama n estiver no modelo
             for key in modelo:
-                if key[:len(start_words)] == start_words: #corta uma chave q existe
+                if key[:len(start_words)] == start_words: #comparando uma chave q existe
                     chaves_possiveis.append(key)
             if not chaves_possiveis:
                 return f"Erro: sequência inicial {start_words} não encontrada no modelo."
@@ -67,7 +67,7 @@ def generate_text(modelo, start_words=None, length=40):
     resultado = list(start_words) #tranforma em lista a chave escolhida para começar
     chave_atual = start_words
 
-    for _ in range(length - 4):
+    for _ in range(length - 5):
         proximas = modelo.get(chave_atual)
         if not proximas:
             break
@@ -76,7 +76,7 @@ def generate_text(modelo, start_words=None, length=40):
         pesos = list(proximas.values())
         escolhida = random.choices(palavras, weights=pesos)[0] #o [0] é pra pegar só a palavra sorteada n a lista da palavra sorteada
         resultado.append(escolhida)
-        chave_atual = (*chave_atual[1:], escolhida) #chave atual vira o quadrigrama com a nova palavra e sem a primeira
+        chave_atual = (*chave_atual[1:], escolhida) #chave atual vira o pentagrama com a nova palavra e sem a primeira
 
     return resultado  # retorna lista de palavras
 
@@ -94,11 +94,11 @@ def formatar_texto(palavras):
     nova_frase = True
 
     for palavra in palavras: #junta a pontuação a palavra e deixa maiuscula depois do ponto final
-        if palavra == '.':
-            texto = texto.rstrip() + palavra #tira o espaço do lado direito da frase pra juntar a pontuação
+        if palavra in '.!?;:—':
+            texto = texto + palavra 
             nova_frase = True
-        elif palavra in ',!?;:':
-            texto = texto.rstrip() + palavra
+        elif palavra == ',':
+            texto = texto + palavra
             nova_frase = False
         else:
             if nova_frase:
@@ -110,9 +110,9 @@ def formatar_texto(palavras):
 
 # === EXECUÇÃO ===
 
-arquivo = "memoriasBras-1.txt"
+arquivo = "memoriasBras-_1_.txt"
 texto = clean_and_read_text(arquivo)
-modelo = build_quadrigram_model(texto)
+modelo = build_pentagram_model(texto)
 
 tokens_gerados = generate_text(modelo,length=1000)
 print(len(texto))
