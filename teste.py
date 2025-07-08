@@ -1,5 +1,6 @@
 import random
-
+def is_pontuacao(token): #parte para identificar se é pontuação
+    return token in '.,!?;:()“”"—'
 def clean_and_read_text(input_file):
     #Lê o texto a partir de 'CAPITULO PRIMEIRO', exclui linhas 'CAPÍTULO', separa pontuação como palavras.
     with open(input_file, encoding='utf-8') as reader:
@@ -14,26 +15,23 @@ def clean_and_read_text(input_file):
                 start = False #vira false se encontrar fim
                 continue
             if start:
-                text += ' '+line.lower()
-
-    pontuacoes = ['.', ',', '!', '?', ';', ':', '(', ')', '“', '”', '"',]
+                text += ' ' + line.lower() #coloca espaço entre as frases e deixa minusculo               
     texto_tratado = ''
     for caractere in text:
-        if caractere in pontuacoes:
-            texto_tratado += ' ' + caractere + ' ' #coloca espaço entre as pontuações
+        if is_pontuacao(caractere):
+            texto_tratado += ' ' + caractere + ' ' #coloca espaço entre as pontuações e o texto
         else:
             texto_tratado += caractere
 
-    palavras = texto_tratado.split()
-    return ' '.join(palavras)
+    palavras = texto_tratado.split() #cria ums lista separando cada palavra e tirando coisas como o \n
+    return palavras
 
-def build_hexagram_model(text): #é oq cria o modelo do nosso hexagrama, meio parecido com o window
-    palavras = text.split()
+def build_quadrigram_model(palavras): #é oq cria o modelo do nosso quadrigrama, meio parecido com o window
     modelo = {}
 
-    for i in range(len(palavras) - 6):
-        chave = tuple(palavras[i:i+6]) #cria uma tupla com 6 palavras
-        proxima = palavras[i+6]
+    for i in range(len(palavras) - 4):
+        chave = tuple(palavras[i:i+4]) #cria uma tupla com 4 palavras
+        proxima = palavras[i+4]
 
         if chave not in modelo: 
             modelo[chave] = {}
@@ -41,35 +39,44 @@ def build_hexagram_model(text): #é oq cria o modelo do nosso hexagrama, meio pa
 
     return modelo
 
-def is_pontuacao(token): #parte para identificar se é pontuação
-    return token in '.,!?;:()“”"'
-
 def generate_text(modelo, start_words=None, length=40):
-    #Gera texto com base em modelo de hexagramas, evitando começar com pontuação.
+    #Gera texto com base em modelo de quadrigramas, evitando começar com pontuação.
     if not modelo:
         return "Erro: modelo vazio."
-
     if not start_words:
-        chaves_validas = [k for k in modelo.keys() if not is_pontuacao(k[0])] #se for pontuação n vale
+        chaves_validas = []
+        for key in modelo.keys():
+            if not is_pontuacao(key[0]): #se for pontuação n vale
+                chaves_validas.append(key)     
         if not chaves_validas:
             return "Erro: sem chave inicial válida."
         start_words = random.choice(chaves_validas) #escolhe um das chaves validas
     else:
-        start_words = tuple(start_words) #pra caso tenha uma palavra inicial definida
+        start_words = tuple(start_words)
+        chaves_possiveis = [] 
+        if len(start_words) != 4 or start_words not in modelo: #se n for um quadrigrama ou se o gradrigrama n estiver no modelo
+            for key in modelo:
+                if key[:len(start_words)] == start_words: #corta uma chave q existe
+                    chaves_possiveis.append(key)
+            if not chaves_possiveis:
+                return f"Erro: sequência inicial {start_words} não encontrada no modelo."
+        
+            start_words = random.choice(chaves_possiveis)
+
 
     resultado = list(start_words) #tranforma em lista a chave escolhida para começar
     chave_atual = start_words
 
-    for _ in range(length - 6):
+    for _ in range(length - 4):
         proximas = modelo.get(chave_atual)
         if not proximas:
             break
 
         palavras = list(proximas.keys())
         pesos = list(proximas.values())
-        escolhida = random.choices(palavras, weights=pesos)[0]
+        escolhida = random.choices(palavras, weights=pesos)[0] #o [0] é pra pegar só a palavra sorteada n a lista da palavra sorteada
         resultado.append(escolhida)
-        chave_atual = (*chave_atual[1:], escolhida) #chave atual vira o hexagrma com a nova palavra e sem a primeira
+        chave_atual = (*chave_atual[1:], escolhida) #chave atual vira o quadrigrama com a nova palavra e sem a primeira
 
     return resultado  # retorna lista de palavras
 
@@ -103,11 +110,11 @@ def formatar_texto(palavras):
 
 # === EXECUÇÃO ===
 
-arquivo = "memoriasBras-_1_.txt"
+arquivo = "memoriasBras-1.txt"
 texto = clean_and_read_text(arquivo)
-modelo = build_hexagram_model(texto)
+modelo = build_quadrigram_model(texto)
 
-tokens_gerados = generate_text(modelo, length=100)
+tokens_gerados = generate_text(modelo,length=1000)
 print(len(texto))
 print("\nTexto gerado:\n")
 print(formatar_texto(tokens_gerados))
