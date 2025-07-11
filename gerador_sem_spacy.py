@@ -110,7 +110,7 @@ def formatar_texto(palavras):
 
 # === EXECUÇÃO ===
 
-arquivo = "memoriasBras-_1_.txt"
+arquivo = "obras.txt"
 texto = clean_and_read_text(arquivo)
 modelo = build_pentagram_model(texto)
 

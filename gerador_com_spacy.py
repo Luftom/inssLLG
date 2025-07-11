@@ -123,7 +123,7 @@ def formatar_texto(palavras):
     return texto.strip()
 
 # === EXECUÇÃO ===
-arquivo = "memoriasBras-_1_.txt"
+arquivo = "obras.txt"
 texto = clean_and_read_text(arquivo)
 
 tokens = processar_texto_com_spacy(texto)
