@@ -30,7 +30,7 @@ def build_pentagram_model(palavras): #é oq cria o modelo do nosso pentagrama, m
     modelo = {}
 
     for i in range(len(palavras) - 5):
-        chave = tuple(palavras[i:i+5]) #cria uma tupla com 4 palavras
+        chave = tuple(palavras[i:i+5]) #cria uma tupla com 5 palavras
         proxima = palavras[i+5]
 
         if chave not in modelo: 
@@ -40,7 +40,7 @@ def build_pentagram_model(palavras): #é oq cria o modelo do nosso pentagrama, m
     return modelo
 
 def generate_text(modelo, start_words=None, length=40):
-    #Gera texto com base em modelo de pnetagramas, evitando começar com pontuação.
+    #Gera texto com base em modelo de pentagramas, evitando começar com pontuação.
     if not modelo:
         return "Erro: modelo vazio."
     if not start_words:
@@ -114,7 +114,7 @@ arquivo = "memoriasBras-_1_.txt"
 texto = clean_and_read_text(arquivo)
 modelo = build_pentagram_model(texto)
 
-tokens_gerados = generate_text(modelo,length=1000)
+tokens_gerados = generate_text(modelo,length=200)
 print(len(texto))
 print("\nTexto gerado:\n")
 print(formatar_texto(tokens_gerados))

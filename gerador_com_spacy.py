@@ -127,9 +127,9 @@ arquivo = "memoriasBras-_1_.txt"
 texto = clean_and_read_text(arquivo)
 
 tokens = processar_texto_com_spacy(texto)
-n = 1  # Mude aqui para 3, 5, 6, etc. se quiser outro n-grama
+n = 5  # Mude aqui para 3, 5, 6, etc. se quiser outro n-grama
 modelo = build_ngram_model(tokens, n)
-tokens_gerados = generate_text_com_original(modelo, n=n, length=100)
+tokens_gerados = generate_text_com_original(modelo, n=n, length=200)
 
 print("\nTexto gerado:\n")
 print(formatar_texto(tokens_gerados))
